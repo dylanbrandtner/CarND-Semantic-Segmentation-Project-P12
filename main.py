@@ -19,9 +19,9 @@ else:
 
 
 # Hyper params
-EPOCHS = 25
+EPOCHS = 50
 BATCH_SIZE = 5
-LEARN_RATE = 0.001
+LEARN_RATE = 0.0005
 DROUPOUT_KEEP_PROB = .5
 
 def load_vgg(sess, vgg_path):
@@ -127,11 +127,16 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     print()
     for i in range(epochs):
         print("EPOCH {} ...".format(i+1))
+        loss_total = 0
+        runs = 0
         for image, label in get_batches_fn(batch_size):
             _, loss = sess.run([train_op, cross_entropy_loss], 
                                feed_dict={input_image: image, correct_label: label,
                                keep_prob: DROUPOUT_KEEP_PROB, learning_rate: LEARN_RATE})
-            print("Loss: = {:.3f}".format(loss))        
+            print("Loss: = {:.3f}".format(loss))
+            loss_total += loss
+            runs += 1
+        print("Average loss: = {:.3f}".format(loss_total/runs))
         print()
 
 tests.test_train_nn(train_nn)
@@ -167,7 +172,7 @@ def run():
         image_input, keep_prob, vgg_layer3_out, vgg_layer4_out, vgg_layer7_out = load_vgg(sess, vgg_path)
         nn = layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes)
         logits, train_op, cross_entropy_loss = optimize(nn, correct_label, learning_rate, num_classes)
-        
+        saver = tf.train.Saver()
 
         # Train NN using the train_nn function
         train_nn(sess, EPOCHS, BATCH_SIZE, get_batches_fn, train_op, cross_entropy_loss, image_input,
@@ -175,6 +180,12 @@ def run():
 
         # Save inference data using helper.save_inference_samples
         helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, image_input)
+        
+        # Save trained model
+        g = sess.graph
+        gdef = g.as_graph_def()
+        tf.train.write_graph(gdef,".","FCN8-graph.pb",False)
+        saver.save(sess, './FCN8-weights')
 
         # OPTIONAL: Apply the trained model to a video
 
