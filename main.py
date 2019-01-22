@@ -185,7 +185,7 @@ def run():
         g = sess.graph
         gdef = g.as_graph_def()
         tf.train.write_graph(gdef,".","FCN8-graph.pb",False)
-        saver.save(sess, './FCN8-weights')
+        saver.save(sess, './FCN8.ckpt')
 
         # OPTIONAL: Apply the trained model to a video
 
