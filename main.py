@@ -59,31 +59,30 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     :param num_classes: Number of classes to classify
     :return: The Tensor for the last layer of output
     """
-    # 1x1 convolution
-    conv_1x1 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, padding= 'same', 
-                                kernel_regularizer= tf.contrib.layers.l2_regularizer(1e-3))
+    # 1x1 convolution of layer 7
+    conv_layer7 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, padding= 'same', 
+                                   kernel_regularizer= tf.contrib.layers.l2_regularizer(1e-3))
     # upsample
-    output = tf.layers.conv2d_transpose(conv_1x1, num_classes, 4,strides= (2, 2), padding= 'same', 
-                                        kernel_regularizer= tf.contrib.layers.l2_regularizer(1e-3))
-    # 1x1 convolution
-    conv_1x1 = tf.layers.conv2d(vgg_layer4_out, num_classes, 1, padding= 'same', 
-                                kernel_regularizer= tf.contrib.layers.l2_regularizer(1e-3))
-    # skip 
-    output2 = tf.add(output, conv_1x1)
+    up_layer7 = tf.layers.conv2d_transpose(conv_layer7, num_classes, 4, strides= (2, 2), padding= 'same', 
+                                             kernel_regularizer= tf.contrib.layers.l2_regularizer(1e-3))
+
+    # 1x1 convolution of layer 4
+    conv_layer4 = tf.layers.conv2d(vgg_layer4_out, num_classes, 1, padding= 'same', 
+                                   kernel_regularizer= tf.contrib.layers.l2_regularizer(1e-3))
+    # skip  
+    skip1 = tf.add(up_layer7, conv_layer4)
     # upsample
-    output3 = tf.layers.conv2d_transpose(output2, num_classes, 4,  strides= (2, 2), padding= 'same', 
-                                         kernel_regularizer= tf.contrib.layers.l2_regularizer(1e-3))
-    # 1x1 convolution
-    conv_1x1 = tf.layers.conv2d(vgg_layer3_out, num_classes, 1, padding= 'same', 
-                                kernel_regularizer= tf.contrib.layers.l2_regularizer(1e-3))
-    # skip 
-    output4 = tf.add(output3, conv_1x1)
+    skip1_up = tf.layers.conv2d_transpose(skip1, num_classes, 4, strides= (2, 2), padding= 'same', 
+                                             kernel_regularizer= tf.contrib.layers.l2_regularizer(1e-3))
+    # 1x1 convolution of layer 3
+    conv_layer3 = tf.layers.conv2d(vgg_layer3_out, num_classes, 1, padding= 'same', 
+                                   kernel_regularizer= tf.contrib.layers.l2_regularizer(1e-3))
+    # skip  
+    skip2 = tf.add(skip1_up, conv_layer3)
     # upsample
-    output_final = tf.layers.conv2d_transpose(output4, num_classes, 16, strides= (8, 8), padding= 'same', 
-                                              kernel_regularizer= tf.contrib.layers.l2_regularizer(1e-3))
-    
-    
-    return output
+    out_final = tf.layers.conv2d_transpose(skip2, num_classes, 16,strides= (8, 8), padding= 'same', 
+                                               kernel_regularizer= tf.contrib.layers.l2_regularizer(1e-3))
+    return out_final
 tests.test_layers(layers)
 
 
@@ -127,12 +126,12 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     print("Training...")
     print()
     for i in range(epochs):
+        print("EPOCH {} ...".format(i+1))
         for image, label in get_batches_fn(batch_size):
             _, loss = sess.run([train_op, cross_entropy_loss], 
                                feed_dict={input_image: image, correct_label: label,
                                keep_prob: DROUPOUT_KEEP_PROB, learning_rate: LEARN_RATE})
-            print("Loss: = {:.3f}".format(loss))
-        print("EPOCH {} ...".format(i+1))
+            print("Loss: = {:.3f}".format(loss))        
         print()
 
 tests.test_train_nn(train_nn)
