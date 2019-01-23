@@ -186,8 +186,14 @@ def run():
         gdef = g.as_graph_def()
         tf.train.write_graph(gdef,".","FCN8-graph.pb",False)
         saver.save(sess, './FCN8.ckpt')
+        
+        print("Relevant Tensor names:")
+        print("logits=" + logits.name)
+        print("keep_prob=" +keep_prob.name)
+        print("image_input=" +image_input.name)
 
         # OPTIONAL: Apply the trained model to a video
+        # See convert_video.py for details
 
 
 if __name__ == '__main__':
