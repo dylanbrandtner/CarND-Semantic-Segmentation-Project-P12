@@ -89,9 +89,9 @@ I used the following hyperparameters:
 #### Does the project correctly label the road?
 According to the rubric "A solution that is close to best would label at least 80% of the road and label no more than 20% of non-road pixels as road."
 
-Initially, I had set my learning rate to 0.001 and epochs to 25.  The results were not great, so I arrived at the final hyperparameters described above.
+Initially, I had set my learning rate to 0.001 and epochs to 25.  The results were not great, so I updated to the final hyperparameters described above.
 
-Here are a few example images that compare my initial and final runs:
+Below are a few example images that compare my initial and final runs.  The initial run is on the left, and the final run is on the right.
 
 <p align="center">
   <img src="./doc/before.png" width="425"> <img src="./doc/after.png" width="425">
@@ -101,6 +101,8 @@ Here are a few example images that compare my initial and final runs:
   <img src="./doc/before5.png" width="425"> <img src="./doc/after5.png" width="425">
 </p> 
 
+As you can see, road pixel detection is much improved in the second run, and false positives are much less common.  
+
 ## Application to videos
 I also chose to freeze my model, and import it into another script I wrote called `convert_video.py`.  This script imports the frozen neural network, and uses it to make predictions on fames in a video.  It then takes the resulting images and stitches them into an output video. I grabbed two example videos from the [Advanced Lane Detection Project](https://github.com/dylanbrandtner/CarND-Advanced-Lane-Lines-P4) and converted the first 10 seconds of each. 
 
@@ -108,7 +110,7 @@ Here is the results:
 
 #### "Project" Video
 <p align="center">
-  <img src="./doc/project_video_out.gif" >
+  <img src="./doc/project_video.gif" >
 </p> 
 
 You can also download the full video [here]( "./project_video_out.mp4")
@@ -116,7 +118,7 @@ You can also download the full video [here]( "./project_video_out.mp4")
 #### "Challenge" Video
 
 <p align="center">
-  <img src="./doc/project_video_out.gif" >
+  <img src="./doc/challenge_video.gif" >
 </p> 
 
 You can also download the full video [here]( "./challenge_video_out.mp4")
