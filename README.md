@@ -94,11 +94,11 @@ Initially, I had set my learning rate to 0.001 and epochs to 25.  The results we
 Here are a few example images that compare my initial and final runs:
 
 <p align="center">
-  <img src="./doc/before.png" > <img src="./doc/after.png" >
-  <img src="./doc/before2.png" > <img src="./doc/after2.png" >
-  <img src="./doc/before3.png" > <img src="./doc/after3.png" >
-  <img src="./doc/before4.png" > <img src="./doc/after4.png" >
-  <img src="./doc/before5.png" > <img src="./doc/after5.png" >
+  <img src="./doc/before.png" width="425"> <img src="./doc/after.png" width="425">
+  <img src="./doc/before2.png" width="425"> <img src="./doc/after2.png" width="425">
+  <img src="./doc/before3.png" width="425"> <img src="./doc/after3.png" width="425">
+  <img src="./doc/before4.png" width="425"> <img src="./doc/after4.png" width="425">
+  <img src="./doc/before5.png" width="425"> <img src="./doc/after5.png" width="425">
 </p> 
 
 ## Application to videos
