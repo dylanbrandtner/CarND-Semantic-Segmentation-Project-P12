@@ -10,7 +10,7 @@ In this project, I'll label the pixels of a road in images using a Fully Convolu
 Using this FCN, I can "segment" the pixels on the road that the network believe to be "road" pixels, and color them green to distinguish them from other objects.  Here is an example result:
 
 <p align="center">
-  <img src="./doc/example.png" >
+  <img src="./doc/example.png" style="display:block;" width="200%" height="200%">
 </p> 
 
 ## Usage instructions
