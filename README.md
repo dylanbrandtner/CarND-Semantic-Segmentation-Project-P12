@@ -1,11 +1,24 @@
 # Semantic Segmentation
-### Introduction
-In this project, you'll label the pixels of a road in images using a Fully Convolutional Network (FCN).
 
-### Setup
-##### GPU
+## Project Introduction
+In this project, I'll label the pixels of a road in images using a Fully Convolutional Network (FCN) based on [this paper](https://people.eecs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf). The architecture of the FCN looks like this:
+
+<p align="center">
+  <img src="./doc/FCN.PNG" >
+</p>
+
+Using this FCN, I can "segment" the pixels on the road that the network believe to be "road" pixels, and color them green to distinguish them from other objects.  Here is an example result:
+
+<p align="center">
+  <img src="./doc/example.png" >
+</p> 
+
+## Usage instructions
+
+### GPU
 `main.py` will check to make sure you are using GPU - if you don't have a GPU on your system, you can use AWS or another cloud computing platform.
-##### Frameworks and Packages
+
+### Frameworks and Packages
 Make sure you have the following is installed:
  - [Python 3](https://www.python.org/)
  - [TensorFlow](https://www.tensorflow.org/)
@@ -14,57 +27,79 @@ Make sure you have the following is installed:
 
 You may also need [Python Image Library (PIL)](https://pillow.readthedocs.io/) for SciPy's `imresize` function.
 
-##### Dataset
+### Dataset
 Download the [Kitti Road dataset](http://www.cvlibs.net/datasets/kitti/eval_road.php) from [here](http://www.cvlibs.net/download.php?file=data_road.zip).  Extract the dataset in the `data` folder.  This will create the folder `data_road` with all the training a test images.
 
-### Start
-##### Implement
-Implement the code in the `main.py` module indicated by the "TODO" comments.
-The comments indicated with "OPTIONAL" tag are not required to complete.
-##### Run
-Run the following command to run the project:
-```
-python main.py
-```
-**Note:** If running this in Jupyter Notebook system messages, such as those regarding test status, may appear in the terminal rather than the notebook.
+### Run
+* To configure and train the model:  `python main.py` 
+* Generate an optimized graph using the following commands:
+  * `git clone https://github.com/tensorflow/tensorflow.git`
+  * `python tensorflow\tensorflow\python\tools\freeze_graph.py --input_graph=FCN8-graph.pb --input_checkpoint=FCN8.ckpt --input_binary=true --output_graph=FCN8-frozen.pb  --output_node_names=Reshape`
+  *`python tensorflow\tensorflow\python\tools\optimize_for_inference.py --input=FCN8-frozen.pb --output=FCN8-optimized.pb --frozen_graph=True --input_names=image_input --output_names=Reshape`
+* To add segmentation to videos: `python convert_video.py --file <INPUT_MP4_FILENAME>`
 
-#### Example Outputs
-Here are examples of a sufficient vs. insufficient output from a trained network:
+## [Rubric Points](https://review.udacity.com/#!/rubrics/989/view)
 
-Sufficient Result          |  Insufficient Result
-:-------------------------:|:-------------------------:
-![Sufficient](./examples/sufficient_result.png)  |  ![Insufficient](./examples/insufficient_result.png)
+Here I will consider the rubric points individually.
 
-### Submission
-1. Ensure you've passed all the unit tests.
-2. Ensure you pass all points on [the rubric](https://review.udacity.com/#!/rubrics/989/view).
-3. Submit the following in a zip file.
- - `helper.py`
- - `main.py`
- - `project_tests.py`
- - Newest inference images from `runs` folder  (**all images from the most recent run**)
- 
-### Tips
-- The link for the frozen `VGG16` model is hardcoded into `helper.py`.  The model can be found [here](https://s3-us-west-1.amazonaws.com/udacity-selfdrivingcar/vgg.zip).
-- The model is not vanilla `VGG16`, but a fully convolutional version, which already contains the 1x1 convolutions to replace the fully connected layers. Please see this [post](https://s3-us-west-1.amazonaws.com/udacity-selfdrivingcar/forum_archive/Semantic_Segmentation_advice.pdf) for more information.  A summary of additional points, follow. 
-- The original FCN-8s was trained in stages. The authors later uploaded a version that was trained all at once to their GitHub repo.  The version in the GitHub repo has one important difference: The outputs of pooling layers 3 and 4 are scaled before they are fed into the 1x1 convolutions.  As a result, some students have found that the model learns much better with the scaling layers included. The model may not converge substantially faster, but may reach a higher IoU and accuracy. 
-- When adding l2-regularization, setting a regularizer in the arguments of the `tf.layers` is not enough. Regularization loss terms must be manually added to your loss function. otherwise regularization is not implemented.
+### Build the Neural Network
 
-### Why Layer 3, 4 and 7?
-In `main.py`, you'll notice that layers 3, 4 and 7 of VGG16 are utilized in creating skip layers for a fully convolutional network. The reasons for this are contained in the paper [Fully Convolutional Networks for Semantic Segmentation](https://arxiv.org/pdf/1605.06211.pdf).
+This is all verified by the provided unit tests, which all pass with my changes.
 
-In section 4.3, and further under header "Skip Architectures for Segmentation" and Figure 3, they note these provided for 8x, 16x and 32x upsampling, respectively. Using each of these in their FCN-8s was the most effective architecture they found. 
+#### Does the project load the pretrained vgg model?
+The `load_vgg` function loads the following tensors from vgg: input, keep_prob, and layers 3,4, and 7.
 
-### Optional sections
-Within `main.py`, there are a few optional sections you can also choose to implement, but are not required for the project.
+#### Does the project learn the correct features from the images?
+The `layers` function implements a Fully Convolutional Network based on the work described in [this paper](https://people.eecs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf):
 
-1. Train and perform inference on the [Cityscapes Dataset](https://www.cityscapes-dataset.com/). Note that the `project_tests.py` is not currently set up to also unit test for this alternate dataset, and `helper.py` will also need alterations, along with changing `num_classes` and `input_shape` in `main.py`. Cityscapes is a much more extensive dataset, with segmentation of 30 different classes (compared to road vs. not road on KITTI) on either 5,000 finely annotated images or 20,000 coarsely annotated images.
-2. Add image augmentation. You can use some of the augmentation techniques you may have used on Traffic Sign Classification or Behavioral Cloning, or look into additional methods for more robust training!
-3. Apply the trained model to a video. This project only involves performing inference on a set of test images, but you can also try to utilize it on a full video.
- 
-### Using GitHub and Creating Effective READMEs
-If you are unfamiliar with GitHub , Udacity has a brief [GitHub tutorial](http://blog.udacity.com/2015/06/a-beginners-git-github-tutorial.html) to get you started. Udacity also provides a more detailed free [course on git and GitHub](https://www.udacity.com/course/how-to-use-git-and-github--ud775).
+<p align="center">
+  <img src="./doc/FCN8_layers.PNG" >
+</p> 
 
-To learn about REAMDE files and Markdown, Udacity provides a free [course on READMEs](https://www.udacity.com/courses/ud777), as well. 
+Here is a description of the new layers added on to VGG:
+1. A 1x1 convolution of the output of VGG (layer 7).  
+2. An "upsample" (i.e. "transpose") of the result of step 1 to increase the size by 2x 
+3. A 1x1 convolution of VGG layer 4 
+4. Add the results of step 2 and 3 (i.e. "add a skip layer")
+5. Upsample the output of step 4 by 2x
+6. A 1x1 convolution of VGG layer 3
+7. Add the results of step 5 and 6 (i.e. "add a skip layer")
+8. Upsample the output of step 7 by 8x
 
-GitHub also provides a [tutorial](https://guides.github.com/features/mastering-markdown/) about creating Markdown files.
+#### Does the project optimize the neural network?
+The `optimize` function implements the details of the neural net optimization.  I use an Adam optimizer to reduce cross entropy loss.
+
+#### Does the project train the neural network?
+The `train_nn` function implements the training sequence.  Average loss per epoch is printed to the console.
+
+### Neural Network Training
+#### Does the project train the model correctly? 
+Average loss for epoch 1 is 6.213.  Over time this is slowly reduced, and epoch 50 has a average loss of 0.034.
+
+#### Does the project use reasonable hyperparameters?
+I used the following hyperparameters:
+
+| Parameter                |  Value | 
+|:------------------------:|:------:| 
+| Epochs                   |   50   | 
+| Batch Size               |    5   |
+| Learning Rate            | 0.0005 |
+| Dropout Keep Probability |   50%  |
+
+#### Does the project correctly label the road?
+According to the rubric "A solution that is close to best would label at least 80% of the road and label no more than 20% of non-road pixels as road."
+
+Here are a few example images from my result runs:
+
+
+
+## Application to videos
+I also chose to freeze my model, and import it into another script I wrote called `convert_video.py`.  This script imports the frozen neural network, and uses it to make predictions on fames in a video.  It then takes the resulting images and stitches them into an output video. I grabbed two example videos from the [Advanced Lane Detection Project](https://github.com/dylanbrandtner/CarND-Advanced-Lane-Lines-P4) and converted them:
+
+Here is the results:
+
+
+
+
+
+## Reflection
