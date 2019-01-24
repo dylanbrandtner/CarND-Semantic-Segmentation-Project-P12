@@ -113,7 +113,7 @@ Here is the results:
   <img src="./doc/project_video.gif" >
 </p> 
 
-You can also download the full video [here]( "./project_video_out.mp4")
+You can also download the full video [here](project_video_out.mp4).
 
 #### "Challenge" Video
 
@@ -121,8 +121,10 @@ You can also download the full video [here]( "./project_video_out.mp4")
   <img src="./doc/challenge_video.gif" >
 </p> 
 
-You can also download the full video [here]( "./challenge_video_out.mp4")
+You can also download the full video [here](challenge_video_out.mp4).
 
 ## Reflection
 
-Overall, this project was quite interesting.  The initial problem this was solving (i.e. labeling each part of the image) was even more interesting, so I wish we were able to train a model to categorize everything, not just roads (i.e. pedestrians, signs, etc).  Although, perhaps the available resources were not enough to reasonably train such a complex model.   I especially enjoyed the challenge of freezing and optimizing a model, and reading it back in to apply to videos.  However, for some reason my processing pipeline always crashed python after 20 images, and I never could determine why.  It seemed like it was due to python running out of memory (perhaps a tensorflow memory leak?).  In any case, this made the video conversion process very tedious.  I wish a bit more time was spent in the lesson materials about loading in a frozen model and using it, as I found the available documentation online to be sparse and often outdated.  
+Overall, this project was very interesting.  The initial problem this was solving (i.e. labeling each part of the image) was even more interesting, so I wish we were able to train a model to categorize everything, not just roads (i.e. pedestrians, signs, etc).  Although, perhaps the available resources were not enough to reasonably train such a complex model.
+
+I especially enjoyed the challenge of freezing and optimizing a model, and reading it back in to apply to videos.  However, for some reason my processing pipeline always crashed python after 20 images, and I never could determine why.  It seemed like it was due to python running out of memory (perhaps a tensorflow memory leak?).  In any case, this made the video conversion process very tedious.  I wish a bit more time was spent in the lesson materials about loading in a frozen model and using it, as I found the available documentation online to be sparse and often outdated.  
