@@ -1,25 +1,15 @@
 import tensorflow as tf
 import scipy.misc
 import numpy as np
-from moviepy.editor import VideoFileClip
+from moviepy.editor import VideoFileClip,ImageSequenceClip
 import argparse
+import os
+import shutil
 
 FRONZEN_GRAPH_FILE = "FCN8-optimized.pb"
 
-#Global tensors
-logits = None
-keep_prob = None
-image_pl = None
-sess = None
 
-
-def process_image(image):
-
-    global logits
-    global keep_prob
-    global image_pl
-    global sess
-
+def process_image(image, logits, keep_prob, image_pl, sess):
     desired_shape = (320, 1152)
     original_shape = image.shape
     
@@ -44,17 +34,19 @@ def process_image(image):
     return scipy.misc.imresize(street_im, original_shape)
     
 if __name__ == '__main__':
-
-    global logits
-    global keep_prob
-    global image_pl
-    global sess
     
     parser = argparse.ArgumentParser(description='Video Converter')
 
     parser.add_argument('-f', '--file', type=str,
                         required=True,
                         help="input video")
+    parser.add_argument('-r', '--fps', type=int,
+                        required=True,
+                        help="output frame per sec val")
+    parser.add_argument('-s', '--start-frame', type=int,
+                        required=False,
+                        default=0,
+                        help="frame in video to start at")  
     args = parser.parse_args()
 
         
@@ -83,11 +75,29 @@ if __name__ == '__main__':
         image_pl = sess.graph.get_tensor_by_name('image_input:0')
         logits = sess.graph.get_tensor_by_name('Reshape:0')
         
-        # Convert video
-        output = args.file.split('.')[0] + "_out.mp4"
-        clip1 = VideoFileClip(args.file)        
-        proc_clip = clip1.fl_image(process_image) 
-        proc_clip.write_videofile(output, audio=False)
+        # Get video
+        vid_name = args.file.split('.')[0]
+        output = vid_name + "_out.mp4"
+        clip = VideoFileClip(args.file).subclip(0,10)
+        
+        # Create images dir
+        if not os.path.isdir(vid_name):
+            os.mkdir(vid_name)
+        
+        # Segment images
+        frame_list = list(clip.iter_frames())
+        num_frames = len(frame_list)
+        i = args.start_frame
+        for frame in frame_list[i-1:]:
+            print("Converting frame %d of %d" % (i, num_frames))
+            seg_image = process_image(frame, logits, keep_prob, image_pl, sess)
+            scipy.misc.imsave(os.path.join(vid_name, '{:05}.png'.format(i)), seg_image)
+            i +=1            
+        
+        # Generate clip and cleanup
+        resultclip = ImageSequenceClip(vid_name, fps=args.fps)
+        resultclip.write_videofile(output, audio=False)
+        shutil.rmtree(vid_name)
 
 
 
