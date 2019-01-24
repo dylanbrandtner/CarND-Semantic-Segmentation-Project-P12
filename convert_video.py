@@ -5,6 +5,7 @@ from moviepy.editor import VideoFileClip,ImageSequenceClip
 import argparse
 import os
 import shutil
+import gc
 
 FRONZEN_GRAPH_FILE = "FCN8-optimized.pb"
 
@@ -40,13 +41,14 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--file', type=str,
                         required=True,
                         help="input video")
-    parser.add_argument('-r', '--fps', type=int,
-                        required=True,
-                        help="output frame per sec val")
+    parser.add_argument('-l', '--length', type=int,
+                        required=False,
+                        default = None,
+                        help="Length in seconds of video to convert")
     parser.add_argument('-s', '--start-frame', type=int,
                         required=False,
-                        default=0,
-                        help="frame in video to start at")  
+                        default=1,
+                        help="frame in video to start at, to help recover from crashes")  
     args = parser.parse_args()
 
         
@@ -78,7 +80,10 @@ if __name__ == '__main__':
         # Get video
         vid_name = args.file.split('.')[0]
         output = vid_name + "_out.mp4"
-        clip = VideoFileClip(args.file).subclip(0,10)
+        clip = VideoFileClip(args.file)
+        if args.length is not None:
+            clip = clip.subclip(0,args.length)
+        orig_fps = clip.fps
         
         # Create images dir
         if not os.path.isdir(vid_name):
@@ -92,10 +97,12 @@ if __name__ == '__main__':
             print("Converting frame %d of %d" % (i, num_frames))
             seg_image = process_image(frame, logits, keep_prob, image_pl, sess)
             scipy.misc.imsave(os.path.join(vid_name, '{:05}.png'.format(i)), seg_image)
-            i +=1            
+            i +=1
+            del seg_image
+            gc.collect()
         
         # Generate clip and cleanup
-        resultclip = ImageSequenceClip(vid_name, fps=args.fps)
+        resultclip = ImageSequenceClip(vid_name, fps=orig_fps)
         resultclip.write_videofile(output, audio=False)
         shutil.rmtree(vid_name)
 
