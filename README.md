@@ -123,6 +123,16 @@ You can also download the full video [here](project_video_out.mp4).
 
 You can also download the full video [here](challenge_video_out.mp4).
 
+The labeling was not quite as consistent on the videos as it was on the test data, but it still did a pretty reasonable job.  I noticed a few issues:
+* The labeling is more "spotty" (i.e. less consistent) and there were typically gaps where the road label is not properly applied (often the brightest portions). 
+* Concrete highway dividers/structures were typically labeled as road.  
+* The sky/background data was often labeled as road.
+
+I attributed these to three things: 
+1. Since the network expected a certain image resolution, I did some scaling of the image down and then back up again after the labels were applied.  This may have lead to some gaps due to the stretching. 
+2. The images in the training set were more diverse, yet more consistent in lighting conditions. Lighter areas were often sidewalk or buildings, not road, and most of the roads themselves were a more consistent color. 
+3. The camera angle in the videos showed a significant amount of sky and background, and "concrete-like" images, like mountains or bridges were typically in that background.  Thus, it might make logical sense to cut off the part of the image above the horizon before passing it into the FCN.  However, it was good to see that even though I didn't do this, the FCN still did a pretty decent job with it's classification above the horizon. 
+
 ## Reflection
 
 Overall, this project was very interesting.  The initial problem this was solving (i.e. labeling each part of the image) was even more interesting, so I wish we were able to train a model to categorize everything, not just roads (i.e. pedestrians, signs, etc).  Although, perhaps the available resources were not enough to reasonably train such a complex model.
