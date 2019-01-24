@@ -1,13 +1,13 @@
 # Semantic Segmentation
 
 ## Project Introduction
-In this project, I'll label the pixels of a road in images using a Fully Convolutional Network (FCN) based on [this paper](https://people.eecs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf). The architecture of the FCN looks like this:
+In this project, the goal is to label the pixels of a road in images using a Fully Convolutional Network (FCN) based on [this paper](https://people.eecs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf). The architecture of the FCN looks like this:
 
 <p align="center">
   <img src="./doc/FCN.PNG" >
 </p>
 
-Using this FCN, I can "segment" the pixels on the road that the network believe to be "road" pixels, and color them green to distinguish them from other objects.  Here is an example result:
+Using this FCN, I can "segment" the pixels on the image that the network believe to be "road" pixels, and color them green to distinguish them from other objects.  Here is an example result:
 
 <p align="center">
   <img src="./doc/example.png" style="display:block;" width="200%" height="200%">
@@ -44,7 +44,7 @@ Here I will consider the rubric points individually.
 
 ### Build the Neural Network
 
-This is all verified by the provided unit tests, which all pass with my changes.
+These are all verified by the provided unit tests, which all pass with my changes.  However, I'll describe each one in detail below.
 
 #### Does the project load the pretrained vgg model?
 The `load_vgg` function loads the following tensors from vgg: input, keep_prob, and layers 3,4, and 7.
@@ -74,7 +74,7 @@ The `train_nn` function implements the training sequence.  Average loss per epoc
 
 ### Neural Network Training
 #### Does the project train the model correctly? 
-Average loss for epoch 1 is 6.213.  Over time this is slowly reduced, and epoch 50 has a average loss of 0.034.
+Using my final hyperparameters, average loss for epoch 1 was 6.213.  Over time this is slowly reduced, and epoch 50 had a average loss of 0.034.
 
 #### Does the project use reasonable hyperparameters?
 I used the following hyperparameters:
@@ -106,7 +106,7 @@ As you can see, road pixel detection is much improved in the second run, and fal
 ## Application to videos
 I also chose to freeze my model, and import it into another script I wrote called `convert_video.py`.  This script imports the frozen neural network, and uses it to make predictions on fames in a video.  It then takes the resulting images and stitches them into an output video. I grabbed two example videos from the [Advanced Lane Detection Project](https://github.com/dylanbrandtner/CarND-Advanced-Lane-Lines-P4) and converted the first 10 seconds of each. 
 
-Here is the results:
+Here are the results:
 
 #### "Project" Video
 <p align="center">
@@ -124,17 +124,17 @@ You can also download the full video [here](project_video_out.mp4).
 You can also download the full video [here](challenge_video_out.mp4).
 
 The labeling was not quite as consistent on the videos as it was on the test data, but it still did a pretty reasonable job.  I noticed a few issues:
-* The labeling is more "spotty" (i.e. less consistent) and there were typically gaps where the road label is not properly applied (often the brightest portions). 
-* Concrete highway dividers/structures were typically labeled as road.  
-* The sky/background data was often labeled as road.
+* The labeling is more "spotty" (i.e. less cohesive) and there were typically gaps where the road label is not properly applied (seemingly the _brightest_ portions). 
+* Concrete highway dividers/structures were labeled as road at least 50% of the time.  
+* The background data was sometimes labeled as road.
 
-I attributed these to three things: 
-1. Since the network expected a certain image resolution, I did some scaling of the image down and then back up again after the labels were applied.  This may have lead to some gaps due to the stretching. 
+I attributed these issues to three limitations: 
+1. Since the network expected a certain image resolution, I did some scaling of the image down and then back up again after the labels were applied.  This may have caused some image stretching, which made the gaps appear more visible. 
 2. The images in the training set were more diverse, yet more consistent in lighting conditions. Lighter areas were often sidewalk or buildings, not road, and most of the roads themselves were a more consistent color. 
-3. The camera angle in the videos showed a significant amount of sky and background, and "concrete-like" images, like mountains or bridges were typically in that background.  Thus, it might make logical sense to cut off the part of the image above the horizon before passing it into the FCN.  However, it was good to see that even though I didn't do this, the FCN still did a pretty decent job with it's classification above the horizon. 
+3. The camera angle in the videos showed a significant amount of sky and background, and "concrete-like" images, like mountains or bridges were often in that background.  Thus, it might make logical sense to cut off the part of the image above the horizon before passing it into the FCN.  However, it was good to see that even though I didn't do this, the FCN still did a pretty good job with its classification above the horizon. 
 
 ## Reflection
 
-Overall, this project was very interesting.  The initial problem this was solving (i.e. labeling each part of the image) was even more interesting, so I wish we were able to train a model to categorize everything, not just roads (i.e. pedestrians, signs, etc).  Although, perhaps the available resources were not enough to reasonably train such a complex model.
+Overall, this project was very interesting.  The initial problem of "Semantic Segmentation" (i.e. labeling each part of the image) was even more interesting, so I wish we were able to train a model to categorize everything, not just roads (i.e. pedestrians, signs, etc).  Although, perhaps the available resources were not enough to reasonably train such a complex model.
 
 I especially enjoyed the challenge of freezing and optimizing a model, and reading it back in to apply to videos.  However, for some reason my processing pipeline always crashed python after 20 images, and I never could determine why.  It seemed like it was due to python running out of memory (perhaps a tensorflow memory leak?).  In any case, this made the video conversion process very tedious.  I wish a bit more time was spent in the lesson materials about loading in a frozen model and using it, as I found the available documentation online to be sparse and often outdated.  
