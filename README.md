@@ -131,7 +131,7 @@ The labeling was not quite as consistent on the videos as it was on the test dat
 I attributed these issues to three limitations: 
 1. Since the network expected a certain image resolution, I did some scaling of the image down and then back up again after the labels were applied.  This may have caused some image stretching, which made the gaps appear more visible. 
 2. The images in the training set were more diverse, yet more consistent in lighting conditions. Lighter areas were often sidewalk or buildings, not road, and most of the roads themselves were a more consistent color. 
-3. The camera angle in the videos showed a significant amount of sky and background, and "concrete-like" images, like mountains or bridges were often in that background.  Thus, it might make logical sense to cut off the part of the image above the horizon before passing it into the FCN.  However, it was good to see that even though I didn't do this, the FCN still did a pretty good job with its classification above the horizon. 
+3. The camera angle in the videos showed a significant amount of sky and background, and "concrete-colored" images, like mountains, bridges, or dark clouds were often in that background.  Thus, it might make logical sense to cut off the part of the image above the horizon before passing it into the FCN.  However, it was good to see that even though I didn't do this, the FCN still did a pretty good job with its classification above the horizon. 
 
 ## Reflection
 
